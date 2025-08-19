@@ -22,10 +22,7 @@ import java.util.List;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfiguration {
-// .requestMatchers ("/auth/**").permitAll()
-// .requestMatchers ("/user/**").hasRole ("USER")
-// .requestMatchers ("/admin/**").hasRole ("ADMIN")
-// .anyRequest ().authenticated ()
+
     @Autowired
     private final MyOncePerRequest oncePerRequest;
 
@@ -38,9 +35,14 @@ public class SecurityConfiguration {
         http
                 .csrf (AbstractHttpConfigurer::disable).
                 cors (cors -> cors.configurationSource (corsConfiguration ()))
-                .authorizeHttpRequests (req -> req
-                        .requestMatchers ("/**").permitAll ()
 
+                .authorizeHttpRequests (req -> req
+
+                                .requestMatchers ("/**").permitAll ()
+//                        .requestMatchers ("/auth/**").permitAll()
+//                        .requestMatchers ("/user/**").hasRole ("USER")
+//                        .requestMatchers ("/admin/**").hasRole ("ADMIN")
+//                        .anyRequest ().authenticated ()
                 )
                 .addFilterBefore (oncePerRequest, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement (sess -> sess.sessionCreationPolicy (SessionCreationPolicy.STATELESS));

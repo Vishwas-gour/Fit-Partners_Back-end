@@ -2,6 +2,9 @@ package com.fitPartner.controller;
 
 import com.fitPartner.dto.ShoeResponse;
 import com.fitPartner.service.ShoeService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,13 +26,18 @@ public class ShoesController {
     }
 
     @GetMapping({"/allShoes", "/{gender}"})
-    public List<ShoeResponse> getShoesByGender(@PathVariable(required = false) String gender) {
-        if (gender == null || gender.isEmpty ()) {
-            return shoeService.getAllShoe ();
+    public Page<ShoeResponse> getShoesByGender(
+            @PathVariable(required = false) String gender,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        if (gender == null || gender.isEmpty()) {
+            return shoeService.getAllShoes(pageable);
         } else {
-            return shoeService.findByGender (gender);
+            return shoeService.findByGender(gender, pageable);
         }
     }
+
 
     @GetMapping("/filter")
     public ResponseEntity<List<ShoeResponse>> filterShoes(

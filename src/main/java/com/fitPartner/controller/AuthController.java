@@ -32,7 +32,6 @@ public class AuthController {
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> forgetPassword(@RequestBody Map<String, String> request) {
-        System.out.println ("reset clased");
         return userService.forgetPassword (request.get("email"),request.get ("newPassword"));
     }
 

@@ -5,6 +5,8 @@ import com.fitPartner.entity.shoe.Review;
 import com.fitPartner.entity.shoe.Shoe;
 import com.fitPartner.repository.ShoesRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +21,24 @@ public class ShoeService {
 
     public List<ShoeResponse> getAllShoe() {
         return shoesRepository.findAll ()
+                .stream ().
+                map (ShoeResponse::new)
+                .collect (Collectors.toList ());
+    }
+
+    public Page<ShoeResponse> getAllShoes(Pageable pageable) {
+        return shoesRepository.findAll(pageable)
+                .map(ShoeResponse::new);
+    }
+
+    public Page<ShoeResponse> findByGender(String gender, Pageable pageable) {
+        return shoesRepository.findByGender(gender, pageable)
+                .map(ShoeResponse::new);
+    }
+
+    public List<ShoeResponse> findByGender(String gender) {
+        List<Shoe> shoes = shoesRepository.findByGender (gender);
+        return shoes
                 .stream ().
                 map (ShoeResponse::new)
                 .collect (Collectors.toList ());
@@ -68,13 +88,7 @@ public class ShoeService {
                 .collect (Collectors.toList ());
     }
 
-    public List<ShoeResponse> findByGender(String gender) {
-        List<Shoe> shoes = shoesRepository.findByGender (gender);
-        return shoes
-                .stream ().
-                map (ShoeResponse::new)
-                .collect (Collectors.toList ());
-    }
+
 
     public List<ShoeResponse> getSameCategoryShoes(String brand, String category, String gender, String material, Long id) {
         List<Shoe> shoes = shoesRepository.findTop10ByBrandOrCategoryOrGenderOrMaterial (brand, category, gender, material);

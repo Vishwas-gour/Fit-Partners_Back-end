@@ -20,18 +20,17 @@ public class MyUserController {
     }
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(Principal principal) {
-        System.out.println ( "controller" + principal.getName ());
+
         return myUserService.getProfile (principal.getName ());
     }
     @GetMapping("/profile/{email}")
     public ResponseEntity<?> getProfileById(@PathVariable String email) {
-        System.out.println ( "controller" + email);
+
         return myUserService.getProfile (email);
     }
 
     @PutMapping("/toggle-block/{email}")
     public ResponseEntity<?> toggleBlock(@PathVariable String email) {
-        System.out.println ( "controller" + email);
         return myUserService.toggleBlock (email);
 
     }

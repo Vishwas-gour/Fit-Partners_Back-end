@@ -36,7 +36,7 @@ public class ReviewController {
 
     @GetMapping("/{shoeId}")
     public List<ReviewResponse> getReviews(@PathVariable Long shoeId) {
-        System.out.println (reviewService.getReviews (shoeId));
+
         return reviewService.getReviews (shoeId);
     }
 
@@ -47,7 +47,6 @@ public class ReviewController {
 
     @GetMapping("/averageRating/{shoeId}")
     public double getAverageRating(@PathVariable Long shoeId) {
-        System.out.println ("averageRating calling");
         return reviewService.getAverageRating (shoeId);
 
     }

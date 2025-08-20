@@ -87,8 +87,6 @@ public class OrderController {
     }
     @PutMapping("/updateStatus/{id}/{newStatus}")
     public ResponseEntity<String> updateOrderStatus(@PathVariable Long id, @PathVariable String newStatus) {
-        System.out.println (id);
-        System.out.println (newStatus);
         return ordersService.updateOrderStatus (id, newStatus);
     }
 }

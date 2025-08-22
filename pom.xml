@@ -107,7 +107,7 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
-        <!--MAIN -->
+        <!--MAIL -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
@@ -116,6 +116,8 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+
+
     </dependencies>
 
     <!-- 📌 Dependency Management to fix CVE warnings -->
@@ -147,8 +149,10 @@
                 <version>4.5.14</version>
             </dependency>
 
-
         </dependencies>
+
+
+
     </dependencyManagement>
 
     <build>

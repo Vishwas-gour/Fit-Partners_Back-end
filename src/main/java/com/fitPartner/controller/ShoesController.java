@@ -5,6 +5,7 @@ import com.fitPartner.service.ShoeService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,23 +41,24 @@ public class ShoesController {
 
 
     @GetMapping("/filter")
-    public ResponseEntity<List<ShoeResponse>> filterShoes(
+    public Page<ShoeResponse> filterShoes(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String brand,
             @RequestParam(required = false) String price,
-            @RequestParam(required = false) String material,
             @RequestParam(required = false) Integer discount,
             @RequestParam(required = false) Double weight,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String gender,
+            @RequestParam(required = false) String material,
             @RequestParam(required = false) Integer rating,
             @RequestParam(required = false) String color,
-            @RequestParam(required = false) Integer size
-    ) {
-        List<ShoeResponse> filtered = shoeService.filterShoes (name, brand, price, discount, weight, category,
-                gender, material, rating, color, size);
-        return ResponseEntity.ok (filtered);
+            @RequestParam(required = false) Integer size,
+            Pageable pageable) {
+
+        return shoeService.filterShoes(name, brand, price, discount, weight,
+                category, gender, material, rating, color, size, pageable);
     }
+
 
     @GetMapping("/sameCategoryShoes")
     public ResponseEntity<List<ShoeResponse>> getSameCategoryShoes(@RequestParam(required = false) String brand,

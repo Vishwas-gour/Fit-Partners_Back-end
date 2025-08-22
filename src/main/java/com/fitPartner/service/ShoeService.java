@@ -6,9 +6,11 @@ import com.fitPartner.entity.shoe.Shoe;
 import com.fitPartner.repository.ShoesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -50,45 +52,52 @@ public class ShoeService {
         return new ShoeResponse (shoe);
     }
 
-    public List<ShoeResponse> filterShoes(String name, String brand, String price, Integer discount, Double weight,
-                                          String category, String gender, String material, Integer rating,
-                                          String color, Integer size) {
+    public Page<ShoeResponse> filterShoes(
+            String name, String brand, String price, Integer discount, Double weight,
+            String category, String gender, String material, Integer rating,
+            String color, Integer size, Pageable pageable) {
 
-        List<ShoeResponse> all = getAllShoe ();
+        List<ShoeResponse> all = getAllShoe();
 
-        return all.stream ()
-                .filter (s -> name == null || name.isBlank () || s.getName ().toLowerCase ().contains (name.toLowerCase ()))
-                .filter (s -> brand == null || brand.isBlank () || s.getBrand ().equalsIgnoreCase (brand))
-                .filter (s -> {
-                    if (price == null || price.isBlank ()) return true;
-                    double p = s.getPriceAfterDiscount ();
-                    if (price.equals ("10000+")) return p > 10000;
+        List<ShoeResponse> filtered = all.stream()
+                .filter(s -> name == null || name.isBlank() || s.getName().toLowerCase().contains(name.toLowerCase()))
+                .filter(s -> brand == null || brand.isBlank() || s.getBrand().equalsIgnoreCase(brand))
+                .filter(s -> {
+                    if (price == null || price.isBlank()) return true;
+                    double p = s.getPriceAfterDiscount();
+                    if (price.equals("10000+")) return p > 10000;
                     try {
-                        String[] range = price.split ("-");
-                        double min = Double.parseDouble (range[0]);
-                        double max = Double.parseDouble (range[1]);
+                        String[] range = price.split("-");
+                        double min = Double.parseDouble(range[0]);
+                        double max = Double.parseDouble(range[1]);
                         return p >= min && p <= max;
                     } catch (Exception e) {
                         return true; // ignore bad format
                     }
                 })
-                .filter (s -> discount == null || s.getDiscountParentage () >= discount)
-                .filter (s -> weight == null || s.getWeight () <= weight)
-                .filter (s -> category == null || category.isBlank () || s.getCategory ().equalsIgnoreCase (category))
-                .filter (s -> gender == null || gender.isBlank () || s.getGender ().equalsIgnoreCase (gender))
-                .filter (s -> material == null || material.isBlank () || s.getMaterial ().equalsIgnoreCase (material))
-                .filter (s -> {
+                .filter(s -> discount == null || s.getDiscountParentage() >= discount)
+                .filter(s -> weight == null || s.getWeight() <= weight)
+                .filter(s -> category == null || category.isBlank() || s.getCategory().equalsIgnoreCase(category))
+                .filter(s -> gender == null || gender.isBlank() || s.getGender().equalsIgnoreCase(gender))
+                .filter(s -> material == null || material.isBlank() || s.getMaterial().equalsIgnoreCase(material))
+                .filter(s -> {
                     if (rating == null) return true;
-                    if (s.getRatings () == null || s.getRatings ().isEmpty ()) return false;
-                    double avg = s.getRatings ().stream ().mapToInt (r -> r).average ().orElse (0);
+                    if (s.getRatings() == null || s.getRatings().isEmpty()) return false;
+                    double avg = s.getRatings().stream().mapToInt(r -> r).average().orElse(0);
                     return avg >= rating;
                 })
-                .filter (s -> color == null || color.isEmpty () || s.getColors ().stream ().anyMatch (c -> c.equalsIgnoreCase (color)))
-                .filter (s -> size == null || s.getSizes ().contains (size))
-                .collect (Collectors.toList ());
+                .filter(s -> color == null || color.isEmpty() || s.getColors().stream().anyMatch(c -> c.equalsIgnoreCase(color)))
+                .filter(s -> size == null || s.getSizes().contains(size))
+                .collect(Collectors.toList());
+
+        // Pagination manually applied
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), filtered.size());
+
+        List<ShoeResponse> paginated = (start < filtered.size()) ? filtered.subList(start, end) : Collections.emptyList();
+
+        return new PageImpl<> (paginated, pageable, filtered.size());
     }
-
-
 
     public List<ShoeResponse> getSameCategoryShoes(String brand, String category, String gender, String material, Long id) {
         List<Shoe> shoes = shoesRepository.findTop10ByBrandOrCategoryOrGenderOrMaterial (brand, category, gender, material);
@@ -100,8 +109,6 @@ public class ShoeService {
                 map (ShoeResponse::new)
                 .collect (Collectors.toList ());
     }
-
-
 
     public List<ShoeResponse> getShoesByName(String name) {
         List<Shoe>  shoes =  shoesRepository.findByNameContainingIgnoreCase (name);
